@@ -82,7 +82,7 @@ const User = () => {
         else if (reduxStoreData?.allProducts?.length) {
             setUsers(reduxStoreData?.allProducts);
         }
-    }, [dispatch, navigate, reduxStoreData?.allProducts?.length]);
+    }, [dispatch, navigate, reduxStoreData?.allProducts,reduxStoreData?.allProducts?.length]);
 
     return <><Navbar currentActive="products" /><div className="relative overflow-x-auto">
         <h3 className="text-3xl text-center my-5 font-bold text-gray-700">Products</h3>

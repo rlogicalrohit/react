@@ -1,6 +1,6 @@
 import React from 'react';
 
-const Four_o_four = () => {
+const FourOFour = () => {
   return (
     <div style={{ textAlign: 'center', marginTop: '50px' }}>
       <h1>404 - Page Not Found</h1>
@@ -9,4 +9,4 @@ const Four_o_four = () => {
   );
 };
 
-export default Four_o_four;
+export default FourOFour;

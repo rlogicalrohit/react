@@ -3,10 +3,9 @@ import { Route, Routes, BrowserRouter, Navigate } from 'react-router-dom';
 import User from './components/getProduct/Product';
 import Add from './components/addProduct/Add';
 import AddUser from './components/registerUser/Add';
-import Edit from './components/updateProduct/Edit'
 import Login from './components/loginUser/Login';
 import axios from 'axios';
-import Four_o_four from './components/common/Four_o_four';
+import FourOFour from './components/common/FourOFour';
 
 
 
@@ -53,7 +52,7 @@ function App() {
           <Route path="/add" element={<PrivateRoute element={<Add />} />} />
           <Route path="/edit/:id" element={<PrivateRoute element={<Add />} />} />
           {/* Wildcard route for 404 page */}
-          <Route path="*" element={<Four_o_four />} />
+          <Route path="*" element={<FourOFour />} />
         </Routes>
       </BrowserRouter>
     </div>

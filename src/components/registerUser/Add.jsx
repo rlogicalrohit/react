@@ -27,7 +27,7 @@ const Add = () => {
     validationSchema: validationSchema,
     onSubmit: async (values) => {
       try {
-        const res = await axios.post("http://localhost:4000/register", values);
+        await axios.post("http://localhost:4000/register", values);
         toast.success("User Created successfully", { position: "top-right" });
         setShowConfetti(true);
         setTimeout(() => {

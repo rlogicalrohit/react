@@ -89,7 +89,7 @@ const Add = () => {
 
       if (id && location.pathname === `/edit/${id}`) {
         try {
-          const updateDetails = await axios.put(`http://localhost:4000/api/update/${id}`, values);
+          await axios.put(`http://localhost:4000/api/update/${id}`, values);
           console.log("updateDetails===>", reduxStoreData);
           const allProducts = reduxStoreData.allProducts
           const updatedData = allProducts.map(obj => {
