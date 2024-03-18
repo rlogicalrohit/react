@@ -15,9 +15,6 @@ const User = () => {
     const reduxStoreData = useSelector(state => state);
     console.log("its a data", reduxStoreData);
 
-    const fetchAllStoredProducts = useSelector(state => state.allProducts);
-
-
     async function deleteUser(id) {
 
         console.log("deleteUser CALLED", id);

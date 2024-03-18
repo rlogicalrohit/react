@@ -14,6 +14,7 @@ const Add = () => {
   const navigate = useNavigate();
   const dispatch = useDispatch();
   const location = useLocation();
+  const [categoryOptions, setCategoryOptions] = useState([]);
   const [products, setProducts] = useState({
     name: "",
     price: "",
@@ -26,6 +27,8 @@ const Add = () => {
 
   useEffect(() => {
     console.log("useEffect");
+    setCategoryOptions(["Electronics", "Clothing", "Accessories", "Books"]); // Populate categoryOptions with your actual options
+
     const fetchDataById = async () => {
       try {
         const response = await axios.get(`http://localhost:4000/api/fetch/${id}`);
@@ -72,7 +75,7 @@ const Add = () => {
       itemWeight: "",
       description: "",
     },
-    
+
 
     validationSchema: Yup.object().shape({
       name: Yup.string().trim().required("Please enter a product name"),
@@ -222,16 +225,21 @@ const Add = () => {
                 >
                   Category
                 </label>
-                <input
-                  type="text"
+
+                <select
                   id="category"
                   name="category"
                   onChange={formik.handleChange}
                   value={formik.values.category}
                   className="bg-gray-50 border border-gray-300 text-gray-900 text-sm rounded-lg focus:ring-primary-600 focus:border-primary-600 block w-full p-2.5 dark:bg-gray-700 dark:border-gray-600 dark:placeholder-gray-400 dark:text-white dark:focus:ring-primary-500 dark:focus:border-primary-500"
-                  placeholder="Type product brand"
-
-                />
+                >
+                  <option value="">Select a category</option>
+                  {categoryOptions.map((category, index) => (
+                    <option key={index} value={category} defaultValue={formik.values.category === category}>
+                      {category}
+                    </option>
+                  ))}
+                </select>
                 {formik.touched.category && formik.errors.category && (
                   <p className="text-red-500 mt-2 text-sm">{formik.errors.category}</p>
                 )}
