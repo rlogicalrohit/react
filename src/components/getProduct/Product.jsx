@@ -72,6 +72,8 @@ const User = () => {
                     localStorage.removeItem("token");
                     navigate("/login");
                 }
+                navigate("/");
+                
             }
         }
 
@@ -82,7 +84,7 @@ const User = () => {
         else if (reduxStoreData?.allProducts?.length) {
             setUsers(reduxStoreData?.allProducts);
         }
-    }, [dispatch, navigate, reduxStoreData?.allProducts,reduxStoreData?.allProducts?.length]);
+    }, [dispatch, navigate]);
 
     return <><Navbar currentActive="products" /><div className="relative overflow-x-auto">
         <h3 className="text-3xl text-center my-5 font-bold text-gray-700">Products</h3>
@@ -104,7 +106,8 @@ const User = () => {
             </thead>
             <tbody>
                 {
-                    products.map((product, index) => {
+                    
+                   products.length ? products.map((product, index) => {
                         return (
                             <tr className="bg-white border-b dark:bg-gray-800 dark:border-gray-700" key={product._id}>
                                 <td className="px-6 py-4 font-medium text-gray-900 whitespace-nowrap dark:text-white">{index + 1}</td>
@@ -120,6 +123,7 @@ const User = () => {
                             </tr>
                         )
                     })
+                    : <h1 className="text-center text-3xl text-gray-700 font-bold">No Products Found</h1>
                 }
             </tbody>
         </table>
