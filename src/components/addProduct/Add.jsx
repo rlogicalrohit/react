@@ -26,6 +26,8 @@ const Add = () => {
     color: [],
   });
   const [file, setFile] = useState(null);
+  const [fields, setMoreFields] = useState(0);
+  const [fieldsValue, setFieldsValue] = useState([]);
 
   console.log("location====>>", location);
   const handleFileChange = (event) => {
@@ -163,7 +165,18 @@ const Add = () => {
   });
 
   console.log("formikformik", formik);
-
+  const handleAddField = () => {
+    setMoreFields(prev => prev + 1);
+    console.log("handleAddField CALLKED", fields);
+  }
+  const handleDynamicFieldChange = (event, index) => {
+    const { name, value } = event.target;
+    console.log(" name, value name, value ", { name, value, index });
+    const updatedFields = [...fieldsValue];
+    updatedFields[index] = value;
+    setFieldsValue(updatedFields);
+    console.log("updatedFields", fieldsValue);
+  }
   return (
     <>
       <Navbar currentActive={location.pathname === `/edit/${id}` ? "Updateproduct" : "Addproduct"} />
@@ -354,6 +367,15 @@ const Add = () => {
                 {formik.touched.image && formik.errors.image && (
                   <p className="text-red-500 mt-2 text-sm">{formik.errors.image}</p>
                 )}
+              </div>
+
+
+              <div className="w-full">
+                <button className="inline-flex items-center px-5 py-2.5 mt-4 sm:mt-6 text-sm font-medium text-center bg-primary-700 rounded-lg focus:ring-4 focus:ring-primary-200 dark:focus:ring-primary-900 hover:bg-primary-800 bg-blue-500" type="button" onClick={handleAddField}>Add Field</button>
+
+                {[...Array(fields)].map((_, index) => (
+                  <input key={index} className="m-2" type="text" name={`field-${index}`} onChange={(e) => handleDynamicFieldChange(e, index)} placeholder={`Field ${index + 1}`} />
+                ))}
               </div>
 
 
