@@ -15,6 +15,7 @@ const Add = () => {
   const dispatch = useDispatch();
   const location = useLocation();
   const [categoryOptions, setCategoryOptions] = useState([]);
+  const [colorOptions, setColorOptions] = useState([]);
   const [products, setProducts] = useState({
     name: "",
     price: "",
@@ -22,12 +23,14 @@ const Add = () => {
     category: "",
     itemWeight: "",
     description: "",
+    color: []
   });
   console.log("location====>>", location);
 
   useEffect(() => {
     console.log("useEffect");
     setCategoryOptions(["Electronics", "Clothing", "Accessories", "Books"]); // Populate categoryOptions with your actual options
+    setColorOptions(["Red", "Blue", "Green", "Yellow"]); // Populate colorOptions with your actual options
 
     const fetchDataById = async () => {
       try {
@@ -37,6 +40,7 @@ const Add = () => {
           navigate("/");
         }
         const productDetails = response.data.map((productData) => {
+          console.log("productData1111111111111111111111111111", productData);
           const data = {
             _id: productData._id,
             name: productData.name,
@@ -44,7 +48,8 @@ const Add = () => {
             brand: productData.brand,
             category: productData.category,
             itemWeight: productData.itemWeight,
-            description: productData.description
+            description: productData.description,
+            color: productData.color
           }
           return data;
         })
@@ -74,6 +79,7 @@ const Add = () => {
       category: "",
       itemWeight: "",
       description: "",
+      color: []
     },
 
 
@@ -84,6 +90,7 @@ const Add = () => {
       category: Yup.string().trim().required("Please select a product category"),
       itemWeight: Yup.string().trim().required("Please enter a product item weight"),
       description: Yup.string().trim().required("Please enter a product description"),
+      color: Yup.array()
     }),
     onSubmit: async (values) => {
 
@@ -245,6 +252,31 @@ const Add = () => {
                 )}
               </div>
 
+              {/* ----------------------------------------------------------------- */}
+
+
+              <div className="w-full">
+                <label
+                  htmlFor="price"
+                  className="block mb-2 text-sm font-medium text-gray-900 dark:text-white"
+                >
+                  Color
+                </label>
+
+                {colorOptions.map((color, index) => (
+                  <label key={index}
+                    htmlFor={`color-${index}`}
+                    className="m-2 text-sm font-medium text-gray-900 dark:text-white"
+                  >
+                    {formik.values.color.includes(color.toString()) ? <span className="bg-zinc-950">{color}</span> : color}
+                    <input type="checkbox" id={`color-${index}`} name="color" checked={formik.values.color.includes(color.toString())} onChange={formik.handleChange} value={color} key={index} />
+                  </label>
+                ))}
+
+                {formik.touched.color && formik.errors.color && (
+                  <p className="text-red-500 mt-2 text-sm">{formik.errors.color}</p>
+                )}
+              </div>
 
               <div className="w-full">
                 <label
