@@ -177,6 +177,15 @@ const Add = () => {
     setFieldsValue(updatedFields);
     console.log("updatedFields", fieldsValue);
   }
+  const handleRemoveField = (index) => {
+    console.log("DELETE INDEXXXXXXXXXx", index);
+    const updatedFields = [...fieldsValue];
+    console.log("updatedFields", updatedFields);
+    updatedFields.splice(index, 1);
+    setFieldsValue(updatedFields);
+    console.log("FINALlllllllllll", fieldsValue);
+    setMoreFields(prev => prev - 1);
+  }
   return (
     <>
       <Navbar currentActive={location.pathname === `/edit/${id}` ? "Updateproduct" : "Addproduct"} />
@@ -374,7 +383,10 @@ const Add = () => {
                 <button className="inline-flex items-center px-5 py-2.5 mt-4 sm:mt-6 text-sm font-medium text-center bg-primary-700 rounded-lg focus:ring-4 focus:ring-primary-200 dark:focus:ring-primary-900 hover:bg-primary-800 bg-blue-500" type="button" onClick={handleAddField}>Add Field</button>
 
                 {[...Array(fields)].map((_, index) => (
-                  <input key={index} className="m-2" type="text" name={`field-${index}`} onChange={(e) => handleDynamicFieldChange(e, index)} placeholder={`Field ${index + 1}`} />
+                  <div key={index} className="flex items-center mt-2">
+                    <input type="text" name={`field-${index}`} onChange={(e) => handleDynamicFieldChange(e, index)} placeholder={`Field ${index + 1}`} className="bg-gray-50 border border-gray-300 text-gray-900 text-sm rounded-lg focus:ring-primary-600 focus:border-primary-600 block w-full p-2.5 dark:bg-gray-700 dark:border-gray-600 dark:placeholder-gray-400 dark:text-white dark:focus:ring-primary-500 dark:focus:border-primary-500" />
+                    <button type="button" className="ml-2 px-3 py-1 bg-red-500 text-white rounded-md" onClick={() => handleRemoveField(index)}>Remove</button>
+                  </div>
                 ))}
               </div>
 
