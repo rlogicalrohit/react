@@ -1,6 +1,6 @@
 import React, { useEffect, useState } from "react";
 import { Link, useLocation, useNavigate, useParams } from "react-router-dom";
-import { useFormik } from "formik";
+import { Formik, useFormik } from "formik";
 import * as Yup from "yup";
 import axios from "axios";
 import toast from "react-hot-toast";
@@ -23,9 +23,15 @@ const Add = () => {
     category: "",
     itemWeight: "",
     description: "",
-    color: []
+    color: [],
   });
+  const [file, setFile] = useState(null);
+
   console.log("location====>>", location);
+  const handleFileChange = (event) => {
+    console.log("event.targetvevent.targetevent.targetevent.targetevent.target", event.target.files);
+    setFile(event.target.files[0]); // Update file state
+  };
 
   useEffect(() => {
     console.log("useEffect");
@@ -41,6 +47,7 @@ const Add = () => {
         }
         const productDetails = response.data.map((productData) => {
           console.log("productData1111111111111111111111111111", productData);
+          const colorValues = productData.color.map(item => item.split(','))
           const data = {
             _id: productData._id,
             name: productData.name,
@@ -49,13 +56,11 @@ const Add = () => {
             category: productData.category,
             itemWeight: productData.itemWeight,
             description: productData.description,
-            color: productData.color
+            color: colorValues[0]
           }
           return data;
         })
-        console.log("productDetails HERE", productDetails);
         setProducts(productDetails[0]);
-        console.log("products", products);
         formik.setValues(productDetails[0]);
       } catch (err) {
         console.log("its an error ", err);
@@ -79,9 +84,8 @@ const Add = () => {
       category: "",
       itemWeight: "",
       description: "",
-      color: []
+      color: [],
     },
-
 
     validationSchema: Yup.object().shape({
       name: Yup.string().trim().required("Please enter a product name"),
@@ -90,13 +94,23 @@ const Add = () => {
       category: Yup.string().trim().required("Please select a product category"),
       itemWeight: Yup.string().trim().required("Please enter a product item weight"),
       description: Yup.string().trim().required("Please enter a product description"),
-      color: Yup.array()
+      color: Yup.array(),
     }),
     onSubmit: async (values) => {
 
+      const formData = new FormData();
+      if (file) {
+        formData.append("image", file);
+        console.log("formData here", formData);
+      }
+      Object.keys(values).forEach((key) => {
+        console.log("key", key, values[key]);
+        formData.append(key, values[key]);
+      });
+
       if (id && location.pathname === `/edit/${id}`) {
         try {
-          await axios.put(`http://localhost:4000/api/update/${id}`, values);
+          await axios.put(`http://localhost:4000/api/update/${id}`, formData);
           console.log("updateDetails===>", reduxStoreData);
           const allProducts = reduxStoreData.allProducts
           const updatedData = allProducts.map(obj => {
@@ -121,10 +135,10 @@ const Add = () => {
           navigate("/");
         }
       }
-
+      console.log("VALUES OF formData=============>s", formData);
       if (!id && location.pathname === `/add`) {
         try {
-          const res = await axios.post("http://localhost:4000/api/create", values);
+          const res = await axios.post("http://localhost:4000/api/create", formData);
           const allProducts = reduxStoreData.allProducts;
           if (allProducts && allProducts.length > 0) {
             allProducts.push(res.data);
@@ -145,6 +159,7 @@ const Add = () => {
         }
       }
     },
+
   });
 
   console.log("formikformik", formik);
@@ -318,6 +333,26 @@ const Add = () => {
                 />
                 {formik.touched.description && formik.errors.description && (
                   <p className="text-red-500 mt-2 text-sm">{formik.errors.description}</p>
+                )}
+              </div>
+
+              <div className="w-full">
+                <label
+                  htmlFor="price"
+                  className="block mb-2 text-sm font-medium text-gray-900 dark:text-white"
+                >
+                  Product Image
+                </label>
+                <input
+                  type="file"
+                  id="image"
+                  name="image"
+                  onChange={handleFileChange}
+                  className="bg-gray-50 border border-gray-300 text-gray-900 text-sm rounded-lg focus:ring-primary-600 focus:border-primary-600 block w-full p-2.5 dark:bg-gray-700 dark:border-gray-600 dark:placeholder-gray-400 dark:text-white dark:focus:ring-primary-500 dark:focus:border-primary-500"
+
+                />
+                {formik.touched.image && formik.errors.image && (
+                  <p className="text-red-500 mt-2 text-sm">{formik.errors.image}</p>
                 )}
               </div>
 
