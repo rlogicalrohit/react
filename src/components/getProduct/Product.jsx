@@ -83,7 +83,7 @@ const User = () => {
         else if (reduxStoreData?.allProducts?.length) {
             setUsers(reduxStoreData?.allProducts);
         }
-    }, [dispatch, navigate]);
+    }, [dispatch, navigate, reduxStoreData?.allProducts]);
 
     return <><Navbar currentActive="products" /><div className="relative overflow-x-auto">
         <h3 className="text-3xl text-center my-5 font-bold text-gray-700">Products</h3>
@@ -111,7 +111,7 @@ const User = () => {
                         return (
                             <tr className="bg-white border-b dark:bg-gray-800 dark:border-gray-700" key={product._id}>
                                 <td className="px-6 py-4 font-medium text-gray-900 whitespace-nowrap dark:text-white">{index + 1}</td>
-                                <td className="px-6 py-4 font-medium text-gray-900 whitespace-nowrap dark:text-white"><img src={"http://localhost:4000/storage/" + product.image} alt="ProductImage" height={100} width={100} /></td>
+                                <td className="px-6 py-4 font-medium text-gray-900 whitespace-nowrap dark:text-white"><img className="h-20 w-20" src={product.image ? `http://localhost:4000/storage/${product.image}` : `http://localhost:4000/storage/default.png`} /></td>
                                 <td className="px-6 py-4 font-medium text-gray-900 whitespace-nowrap dark:text-white">{product.name}</td>
                                 <td className="px-6 py-4 font-medium text-gray-900 whitespace-nowrap dark:text-white">{product.price}</td>
                                 <td className="px-6 py-4 font-medium text-gray-900 whitespace-nowrap dark:text-white">{product.brand}</td>

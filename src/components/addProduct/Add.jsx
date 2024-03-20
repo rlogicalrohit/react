@@ -1,4 +1,4 @@
-import React, { useEffect, useState } from "react";
+import React, { useEffect, useRef, useState } from "react";
 import { Link, useLocation, useNavigate, useParams } from "react-router-dom";
 import { Formik, useFormik } from "formik";
 import * as Yup from "yup";
@@ -28,15 +28,13 @@ const Add = () => {
   const [file, setFile] = useState(null);
   const [fields, setMoreFields] = useState(0);
   const [fieldsValue, setFieldsValue] = useState([]);
+  const fileInputRef = useRef(null);
 
-  console.log("location====>>", location);
   const handleFileChange = (event) => {
-    console.log("event.targetvevent.targetevent.targetevent.targetevent.target", event.target.files);
-    setFile(event.target.files[0]); // Update file state
+    setFile(URL.createObjectURL(event.target.files[0])); // Update file state
   };
 
   useEffect(() => {
-    console.log("useEffect");
     setCategoryOptions(["Electronics", "Clothing", "Accessories", "Books"]); // Populate categoryOptions with your actual options
     setColorOptions(["Red", "Blue", "Green", "Yellow"]); // Populate colorOptions with your actual options
 
@@ -48,7 +46,6 @@ const Add = () => {
           navigate("/");
         }
         const productDetails = response.data.map((productData) => {
-          console.log("productData1111111111111111111111111111", productData);
           const colorValues = productData.color.map(item => item.split(','))
           const data = {
             _id: productData._id,
@@ -64,8 +61,8 @@ const Add = () => {
         })
         setProducts(productDetails[0]);
         formik.setValues(productDetails[0]);
+        setFile("http://localhost:4000/storage/" + response.data[0].image);
       } catch (err) {
-        console.log("its an error ", err);
         toast.error((err.response.data?.message || err.response.data), { position: "top-right" })
         if (err.response.data?.message === "Invalid token") {
           localStorage.removeItem("token");
@@ -96,33 +93,30 @@ const Add = () => {
       category: Yup.string().trim().required("Please select a product category"),
       itemWeight: Yup.string().trim().required("Please enter a product item weight"),
       description: Yup.string().trim().required("Please enter a product description"),
-      color: Yup.array(),
+      color: Yup.array()
     }),
     onSubmit: async (values) => {
 
       const formData = new FormData();
       if (file) {
         formData.append("image", file);
-        console.log("formData here", formData);
       }
       Object.keys(values).forEach((key) => {
-        console.log("key", key, values[key]);
         formData.append(key, values[key]);
       });
 
       if (id && location.pathname === `/edit/${id}`) {
         try {
-          await axios.put(`http://localhost:4000/api/update/${id}`, formData);
-          console.log("updateDetails===>", reduxStoreData);
+          const updateProductResponse = await axios.put(`http://localhost:4000/api/update/${id}`, formData);
           const allProducts = reduxStoreData.allProducts
           const updatedData = allProducts.map(obj => {
             if (obj._id === id) {
+              values.image = updateProductResponse.data.image
               return { ...obj, ...values };
             } else {
               return obj;
             }
           });
-          console.log("updatedData===========>", updatedData);
           dispatch(storeFetchedData(updatedData));
           navigate("/")
           toast.success("Product Updated Successfully", { position: "top-right" });
@@ -137,7 +131,6 @@ const Add = () => {
           navigate("/");
         }
       }
-      console.log("VALUES OF formData=============>s", formData);
       if (!id && location.pathname === `/add`) {
         try {
           const res = await axios.post("http://localhost:4000/api/create", formData);
@@ -146,11 +139,9 @@ const Add = () => {
             allProducts.push(res.data);
           }
           dispatch(storeFetchedData(allProducts));
-          console.log("allProducts", allProducts);
           toast.success("Product created successfully", { position: "top-right" });
           navigate("/");
         } catch (err) {
-          console.log("err", err);
           toast.error(err.response?.data?.message || err.response?.data, {
             position: "top-right",
           });
@@ -164,28 +155,27 @@ const Add = () => {
 
   });
 
-  console.log("formikformik", formik);
   const handleAddField = () => {
     setMoreFields(prev => prev + 1);
-    console.log("handleAddField CALLKED", fields);
   }
   const handleDynamicFieldChange = (event, index) => {
     const { name, value } = event.target;
-    console.log(" name, value name, value ", { name, value, index });
     const updatedFields = [...fieldsValue];
     updatedFields[index] = value;
     setFieldsValue(updatedFields);
-    console.log("updatedFields", fieldsValue);
   }
   const handleRemoveField = (index) => {
-    console.log("DELETE INDEXXXXXXXXXx", index);
     const updatedFields = [...fieldsValue];
-    console.log("updatedFields", updatedFields);
     updatedFields.splice(index, 1);
     setFieldsValue(updatedFields);
-    console.log("FINALlllllllllll", fieldsValue);
     setMoreFields(prev => prev - 1);
   }
+  const handleRemoveImage = () => {
+    setFile(null); // Clear file state
+    if (fileInputRef.current) {
+      fileInputRef.current.value = ""; // Reset file input value
+    }
+  };
   return (
     <>
       <Navbar currentActive={location.pathname === `/edit/${id}` ? "Updateproduct" : "Addproduct"} />
@@ -370,9 +360,35 @@ const Add = () => {
                   id="image"
                   name="image"
                   onChange={handleFileChange}
+                  ref={fileInputRef}
                   className="bg-gray-50 border border-gray-300 text-gray-900 text-sm rounded-lg focus:ring-primary-600 focus:border-primary-600 block w-full p-2.5 dark:bg-gray-700 dark:border-gray-600 dark:placeholder-gray-400 dark:text-white dark:focus:ring-primary-500 dark:focus:border-primary-500"
 
                 />
+                {/* {file && (
+                  <button
+                    type="button"
+                    className="inline-block mt-2 px-3 py-1.5 bg-red-500 text-white rounded-lg"
+                    onClick={handleRemoveImage}
+                  >
+                    Remove Image  
+                  </button>
+                )} */}
+                {file &&
+                  <div className="flex items-center mt-2">
+                    <img
+                      src={file}
+                      alt="Selected Image"
+                      className="w-16 h-16 mr-4 object-cover rounded-lg"
+                    />
+                    <button
+                      type="button"
+                      className="inline-block px-3 py-1.5 bg-red-500 text-white rounded-lg"
+                      onClick={handleRemoveImage}
+                    >
+                      Remove Image
+                    </button>
+                  </div>
+                }
                 {formik.touched.image && formik.errors.image && (
                   <p className="text-red-500 mt-2 text-sm">{formik.errors.image}</p>
                 )}
