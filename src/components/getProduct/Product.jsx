@@ -5,7 +5,7 @@ import toast from "react-hot-toast";
 import Navbar from "../common/Navbar";
 import Swal from "sweetalert2";
 import { useDispatch } from 'react-redux';
-import { setFetchedDataLength, storeFetchedData } from '../../action';
+import { storeFetchedData } from '../../action';
 import { useSelector } from 'react-redux';
 
 const User = () => {
@@ -36,7 +36,7 @@ const User = () => {
                         const allProducts = reduxStoreData.allProducts
                         const filteredProducts = allProducts.filter((product) => product._id !== id)
                         dispatch(storeFetchedData(filteredProducts));
-                        dispatch(setFetchedDataLength(filteredProducts.length));
+                        // dispatch(setFetchedDataLength(filteredProducts.length));
                         // dispatch(storeFetchedData(response.data));
                         toast.success("Product Deleted Successfully", { position: "top-right" })
                     }).catch((error) => {
@@ -59,11 +59,10 @@ const User = () => {
 
                 const response = await axios.get("http://localhost:4000/api/fetchAll");
                 console.log("response===>", response);
-                dispatch(setFetchedDataLength(response.data.length));
+                // dispatch(setFetchedDataLength(response.data.length));
                 dispatch(storeFetchedData(response.data));
                 console.log("reduxStoreData.allProducts===>", reduxStoreData.allProducts);
                 setUsers(response.data);
-
 
             } catch (error) {
                 console.error(error);
@@ -96,6 +95,7 @@ const User = () => {
             <thead className="text-xs text-gray-700 uppercase bg-gray-50 dark:bg-gray-700 dark:text-gray-400">
                 <tr>
                     <th className="px-6 py-3">S.No</th>
+                    <th className="px-6 py-3"> Image</th>
                     <th className="px-6 py-3"> Name</th>
                     <th className="px-6 py-3">Price</th>
                     <th className="px-6 py-3">Brand</th>
@@ -111,6 +111,7 @@ const User = () => {
                         return (
                             <tr className="bg-white border-b dark:bg-gray-800 dark:border-gray-700" key={product._id}>
                                 <td className="px-6 py-4 font-medium text-gray-900 whitespace-nowrap dark:text-white">{index + 1}</td>
+                                <td className="px-6 py-4 font-medium text-gray-900 whitespace-nowrap dark:text-white"><img src={"http://localhost:4000/storage/" + product.image} alt="ProductImage" height={100} width={100} /></td>
                                 <td className="px-6 py-4 font-medium text-gray-900 whitespace-nowrap dark:text-white">{product.name}</td>
                                 <td className="px-6 py-4 font-medium text-gray-900 whitespace-nowrap dark:text-white">{product.price}</td>
                                 <td className="px-6 py-4 font-medium text-gray-900 whitespace-nowrap dark:text-white">{product.brand}</td>
