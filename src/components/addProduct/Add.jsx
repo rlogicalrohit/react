@@ -30,11 +30,15 @@ const Add = () => {
   const [fieldsValue, setFieldsValue] = useState([]);
   const fileInputRef = useRef(null);
 
+  console.log("location====>>", location);
   const handleFileChange = (event) => {
-    setFile(URL.createObjectURL(event.target.files[0])); // Update file state
+    console.log("event.targetvevent.targetevent.targetevent.targetevent.target", event.target.files);
+    console.log("LOCATION PATRHHNAME ON CHANGE-------->", location.pathname);
+    setFile(event.target.files[0]); // Update file state
   };
 
   useEffect(() => {
+    console.log("useEffect");
     setCategoryOptions(["Electronics", "Clothing", "Accessories", "Books"]); // Populate categoryOptions with your actual options
     setColorOptions(["Red", "Blue", "Green", "Yellow"]); // Populate colorOptions with your actual options
 
@@ -46,6 +50,7 @@ const Add = () => {
           navigate("/");
         }
         const productDetails = response.data.map((productData) => {
+          console.log("productData1111111111111111111111111111", productData);
           const colorValues = productData.color.map(item => item.split(','))
           const data = {
             _id: productData._id,
@@ -61,8 +66,10 @@ const Add = () => {
         })
         setProducts(productDetails[0]);
         formik.setValues(productDetails[0]);
-        setFile("http://localhost:4000/storage/" + response.data[0].image);
+        // setFile(productDetails[0].image);
+        console.log("FILE11111111111111", file);
       } catch (err) {
+        console.log("its an error ", err);
         toast.error((err.response.data?.message || err.response.data), { position: "top-right" })
         if (err.response.data?.message === "Invalid token") {
           localStorage.removeItem("token");
@@ -98,25 +105,32 @@ const Add = () => {
     onSubmit: async (values) => {
 
       const formData = new FormData();
+      console.log("filefile", file);
       if (file) {
         formData.append("image", file);
+        console.log("formData here", formData);
       }
       Object.keys(values).forEach((key) => {
+        console.log("key", key, values[key]);
         formData.append(key, values[key]);
       });
 
       if (id && location.pathname === `/edit/${id}`) {
         try {
           const updateProductResponse = await axios.put(`http://localhost:4000/api/update/${id}`, formData);
+          console.log("updateProductResponse", updateProductResponse);
+          console.log("updateDetails===>", reduxStoreData);
           const allProducts = reduxStoreData.allProducts
           const updatedData = allProducts.map(obj => {
             if (obj._id === id) {
               values.image = updateProductResponse.data.image
+              console.log("FINAL RESULT HERE", { ...obj, ...values });
               return { ...obj, ...values };
             } else {
               return obj;
             }
           });
+          console.log("updatedData===========>", updatedData);
           dispatch(storeFetchedData(updatedData));
           navigate("/")
           toast.success("Product Updated Successfully", { position: "top-right" });
@@ -131,6 +145,7 @@ const Add = () => {
           navigate("/");
         }
       }
+      console.log("VALUES OF formData=============>s", formData);
       if (!id && location.pathname === `/add`) {
         try {
           const res = await axios.post("http://localhost:4000/api/create", formData);
@@ -139,9 +154,11 @@ const Add = () => {
             allProducts.push(res.data);
           }
           dispatch(storeFetchedData(allProducts));
+          console.log("allProducts", allProducts);
           toast.success("Product created successfully", { position: "top-right" });
           navigate("/");
         } catch (err) {
+          console.log("err", err);
           toast.error(err.response?.data?.message || err.response?.data, {
             position: "top-right",
           });
@@ -155,19 +172,26 @@ const Add = () => {
 
   });
 
+  console.log("formikformik", formik);
   const handleAddField = () => {
     setMoreFields(prev => prev + 1);
+    console.log("handleAddField CALLKED", fields);
   }
   const handleDynamicFieldChange = (event, index) => {
     const { name, value } = event.target;
+    console.log(" name, value name, value ", { name, value, index });
     const updatedFields = [...fieldsValue];
     updatedFields[index] = value;
     setFieldsValue(updatedFields);
+    console.log("updatedFields", fieldsValue);
   }
   const handleRemoveField = (index) => {
+    console.log("DELETE INDEXXXXXXXXXx", index);
     const updatedFields = [...fieldsValue];
+    console.log("updatedFields", updatedFields);
     updatedFields.splice(index, 1);
     setFieldsValue(updatedFields);
+    console.log("FINALlllllllllll", fieldsValue);
     setMoreFields(prev => prev - 1);
   }
   const handleRemoveImage = () => {
@@ -376,7 +400,7 @@ const Add = () => {
                 {file &&
                   <div className="flex items-center mt-2">
                     <img
-                      src={file}
+                      src={URL.createObjectURL(file)}
                       alt="Selected Image"
                       className="w-16 h-16 mr-4 object-cover rounded-lg"
                     />
