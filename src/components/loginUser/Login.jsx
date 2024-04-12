@@ -3,9 +3,13 @@ import toast from "react-hot-toast";
 import { Link, useNavigate } from "react-router-dom";
 import { useFormik } from "formik";
 import * as Yup from "yup";
+import { useDispatch } from "react-redux";
+import { storeUserPermissions } from "../../action";
 
 const Login = () => {
+  
   const navigate = useNavigate();
+  const dispatch = useDispatch();
 
   const validationSchema = Yup.object().shape({
     email: Yup.string().email("Invalid email").required("Email is required"),
@@ -21,7 +25,11 @@ const Login = () => {
     onSubmit: async (values) => {
       try {
         const res = await axios.post("http://localhost:4000/login", values);
-        localStorage.setItem("token", res.data.token);
+        console.log("its a res here ",res);
+        
+        dispatch(storeUserPermissions(res.data.payload.permission));
+
+        localStorage.setItem("token", res.data.payload.token);
         toast.success("Login successfully", { position: "top-right" });
         navigate("/");
       } catch (err) {

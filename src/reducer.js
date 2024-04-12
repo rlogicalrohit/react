@@ -16,6 +16,12 @@ const rootReducer = (state = initialState, action) => {
                 ...state,
                 allProducts: action.payload
             };
+
+        case 'PERMISSIONS':
+                return {
+                    ...state,
+                    permissions: action.payload
+                };
         default:
             return state;
     }

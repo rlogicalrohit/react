@@ -13,3 +13,11 @@ export const storeFetchedData = (data) => {
         payload: data
     };
 }
+
+
+export const storeUserPermissions = (data) => {
+    return {
+        type: 'PERMISSIONS',
+        payload: data
+    };
+}

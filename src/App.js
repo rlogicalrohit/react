@@ -7,6 +7,7 @@ import Login from './components/loginUser/Login';
 import axios from 'axios';
 import FourOFour from './components/common/FourOFour';
 import View from './components/addProduct/View';
+import { useSelector } from 'react-redux';
 
 
 
@@ -30,10 +31,19 @@ axios.interceptors.request.use(
   }
 );
 
-const PrivateRoute = ({ element }) => {
+const PrivateRoute = ({ element, routeName }) => {
+  const reduxStoreData = useSelector(state => state);
+
+  console.log("routeName HERE ",routeName);
+  const [resource, action] = routeName.split("-");
+
+  // const hasPermission = reduxStoreData.permissions.some(obj => obj.hasOwnProperty(resource) && obj[resource][action]);
+// Handle permission for route from here
+
   const token = localStorage.getItem('token');
   const isAuthenticated = !!token;
-  return isAuthenticated ? element : <Navigate to="/login" />;
+  console.log("reduxStoreData FROM APP", reduxStoreData.permissions);
+  return (isAuthenticated ) ? element : <Navigate to="/login" />;
 };
 
 const PublicRoute = ({ element, path }) => {
@@ -49,10 +59,10 @@ function App() {
         <Routes>
           <Route path="/login" element={<PublicRoute element={<Login />} path="/login" />} />
           <Route path="/register" element={<PublicRoute element={<AddUser />} path="/register" />} />
-          <Route path="/" element={<PrivateRoute element={<User />} />} />
-          <Route path="/add" element={<PrivateRoute element={<Add />} />} />
-          <Route path="/edit/:id" element={<PrivateRoute element={<Add />} />} />
-          <Route path="/view/:id" element={<PrivateRoute element={<View />} />} />
+          <Route path="/" element={<PrivateRoute routeName={"products-read"} element={<User />} />} />
+          <Route path="/add" element={<PrivateRoute routeName={"products-create"} element={<Add />} />} />
+          <Route path="/edit/:id" element={<PrivateRoute routeName={"products-edit"} element={<Add />} />} />
+          <Route path="/view/:id" element={<PrivateRoute routeName={"products-read"} element={<View />} />} />
           {/* Wildcard route for 404 page */}
           <Route path="*" element={<FourOFour />} />
         </Routes>
