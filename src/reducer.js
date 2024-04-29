@@ -18,10 +18,15 @@ const rootReducer = (state = initialState, action) => {
             };
 
         case 'PERMISSIONS':
-                return {
-                    ...state,
-                    permissions: action.payload
-                };
+            return {
+                ...state,
+                permissions: action.payload
+            };
+        case 'CART':
+            return {
+                ...state,
+                cart: action.payload
+            };
         default:
             return state;
     }

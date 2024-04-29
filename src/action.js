@@ -21,3 +21,10 @@ export const storeUserPermissions = (data) => {
         payload: data
     };
 }
+
+export const storeProductCart = (data) => {
+    return {
+        type: 'CART',
+        payload: data
+    };
+}

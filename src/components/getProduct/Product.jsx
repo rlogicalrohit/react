@@ -5,7 +5,7 @@ import toast from "react-hot-toast";
 import Navbar from "../common/Navbar";
 import Swal from "sweetalert2";
 import { useDispatch } from 'react-redux';
-import { storeFetchedData } from '../../action';
+import { storeFetchedData, storeProductCart } from '../../action';
 import { useSelector } from 'react-redux';
 
 const User = () => {
@@ -52,6 +52,20 @@ const User = () => {
             }
         });
     }
+
+    async function addToCart(id) {
+        console.log("ITS A PRODUCT ID HERE FOR ADD TO CART:------>", id)
+        let allProductsIds = []
+        if (reduxStoreData.cart) {
+            allProductsIds = [...reduxStoreData.cart]
+            allProductsIds.push(id);
+        }
+        else if (!reduxStoreData.cart) {
+            allProductsIds.push(id);
+        }
+        dispatch(storeProductCart(allProductsIds));
+        console.log("its a reduxStoreData HERE", reduxStoreData);
+    }
     useEffect(() => {
         console.log("useEffect");
         const fetchData = async () => {
@@ -72,7 +86,6 @@ const User = () => {
                     navigate("/login");
                 }
                 navigate("/");
-
             }
         }
 
@@ -83,53 +96,54 @@ const User = () => {
         else if (reduxStoreData?.allProducts?.length) {
             setUsers(reduxStoreData?.allProducts);
         }
-    }, [dispatch, navigate, reduxStoreData?.allProducts]);
+    }, []);
 
-    return <><Navbar currentActive="products" /><div className="relative overflow-x-auto">
-        <h3 className="text-3xl text-center my-5 font-bold text-gray-700">Products</h3>
+    return <>
+        <Navbar currentActive="products" /><div className="relative overflow-x-auto">
+            <h3 className="text-3xl text-center my-5 font-bold text-gray-700">Products</h3>
 
-        <button type="button" className="m-2 text-white text-xs font-medium bg-blue-700 hover:bg-blue-800 focus:ring-4 focus:outline-none focus:ring-blue-300 font-medium rounded-lg text-sm w-full sm:w-auto px-5 py-2.5 text-center dark:bg-blue-600 dark:hover:bg-blue-700 dark:focus:ring-blue-800 ml-5"><Link to={"/add"}>Add Product</Link></button>
+            <button type="button" className="m-2 text-white text-xs font-medium bg-blue-700 hover:bg-blue-800 focus:ring-4 focus:outline-none focus:ring-blue-300 font-medium rounded-lg text-sm w-full sm:w-auto px-5 py-2.5 text-center dark:bg-blue-600 dark:hover:bg-blue-700 dark:focus:ring-blue-800 ml-5"><Link to={"/add"}>Add Product</Link></button>
+            <br />
+            <table className="w-full text-sm text-left rtl:text-right text-gray-500 dark:text-gray-400">
+                <thead className="text-xs text-gray-700 uppercase bg-gray-50 dark:bg-gray-700 dark:text-gray-400">
+                    <tr>
+                        <th className="px-6 py-3">S.No</th>
+                        <th className="px-6 py-3"> Image</th>
+                        <th className="px-6 py-3"> Name</th>
+                        <th className="px-6 py-3">Price</th>
+                        <th className="px-6 py-3">Brand</th>
+                        <th className="px-6 py-3">Category</th>
+                        <th className="px-6 py-3">Item Weight (gms)</th>
+                        <th className="px-6 py-3">Actions</th>
+                    </tr>
+                </thead>
+                <tbody>
+                    {
+                        products.map((product, index) => {
+                            return (
+                                <tr className="bg-white border-b dark:bg-gray-800 dark:border-gray-700" key={product._id}>
+                                    <td className="px-6 py-4 font-medium text-gray-900 whitespace-nowrap dark:text-white">{index + 1}</td>
+                                    <td className="px-6 py-4 font-medium text-gray-900 whitespace-nowrap dark:text-white"><img className="h-20 w-20" src={product.image ? `http://localhost:4000/storage/${product.image}` : `http://localhost:4000/storage/default.png`} /></td>
+                                    <td className="px-6 py-4 font-medium text-gray-900 whitespace-nowrap dark:text-white">{product.name}</td>
+                                    <td className="px-6 py-4 font-medium text-gray-900 whitespace-nowrap dark:text-white">{product.price}</td>
+                                    <td className="px-6 py-4 font-medium text-gray-900 whitespace-nowrap dark:text-white">{product.brand}</td>
+                                    <td className="px-6 py-4 font-medium text-gray-900 whitespace-nowrap dark:text-white">{product.category}</td>
+                                    <td className="px-6 py-4 font-medium text-gray-900 whitespace-nowrap dark:text-white">{product.itemWeight}</td>
+                                    <td className="px-6 py-4 font-medium text-gray-900 whitespace-nowrap dark:text-white">
+                                        <button className="text-white bg-blue-700 hover:bg-blue-800 focus:ring-4 focus:ring-blue-300 font-medium rounded-lg text-sm px-5 py-2.5 me-2 mb-2 dark:bg-blue-600 dark:hover:bg-blue-700 focus:outline-none dark:focus:ring-blue-800"><Link to={`/view/` + product._id}>View</Link></button>
+                                        <button className="text-white bg-blue-700 hover:bg-blue-800 focus:ring-4 focus:ring-blue-300 font-medium rounded-lg text-sm px-5 py-2.5 me-2 mb-2 dark:bg-blue-600 dark:hover:bg-blue-700 focus:outline-none dark:focus:ring-blue-800"><Link to={`/edit/` + product._id}>Edit</Link></button>
+                                        <button className="focus:outline-none text-white bg-red-700 hover:bg-red-800 focus:ring-4 focus:ring-red-300 font-medium rounded-lg text-sm px-5 py-2.5 me-2 mb-2 dark:bg-red-600 dark:hover:bg-red-700 dark:focus:ring-red-900" onClick={() => deleteUser(product._id)}>Delete</button>
+                                        <button disabled={reduxStoreData?.cart?.includes(product._id)} className="focus:outline-none text-white bg-green-700 hover:bg-green-800 focus:ring-4 focus:ring-red-300 font-medium rounded-lg text-sm px-5 py-2.5 me-2 mb-2 dark:bg-green-600 dark:hover:bg-green-700 dark:focus:ring-green-900" onClick=
+                                            {() => addToCart(product._id)}>Add to cart</button>
 
-        <br />
-        <table className="w-full text-sm text-left rtl:text-right text-gray-500 dark:text-gray-400">
-            <thead className="text-xs text-gray-700 uppercase bg-gray-50 dark:bg-gray-700 dark:text-gray-400">
-                <tr>
-                    <th className="px-6 py-3">S.No</th>
-                    <th className="px-6 py-3"> Image</th>
-                    <th className="px-6 py-3"> Name</th>
-                    <th className="px-6 py-3">Price</th>
-                    <th className="px-6 py-3">Brand</th>
-                    <th className="px-6 py-3">Category</th>
-                    <th className="px-6 py-3">Item Weight (gms)</th>
-                    <th className="px-6 py-3">Actions</th>
-                </tr>
-            </thead>
-            <tbody>
-                {
-
-                    products.map((product, index) => {
-                        return (
-                            <tr className="bg-white border-b dark:bg-gray-800 dark:border-gray-700" key={product._id}>
-                                <td className="px-6 py-4 font-medium text-gray-900 whitespace-nowrap dark:text-white">{index + 1}</td>
-                                <td className="px-6 py-4 font-medium text-gray-900 whitespace-nowrap dark:text-white"><img className="h-20 w-20" src={product.image ? `http://localhost:4000/storage/${product.image}` : `http://localhost:4000/storage/default.png`} /></td>
-                                <td className="px-6 py-4 font-medium text-gray-900 whitespace-nowrap dark:text-white">{product.name}</td>
-                                <td className="px-6 py-4 font-medium text-gray-900 whitespace-nowrap dark:text-white">{product.price}</td>
-                                <td className="px-6 py-4 font-medium text-gray-900 whitespace-nowrap dark:text-white">{product.brand}</td>
-                                <td className="px-6 py-4 font-medium text-gray-900 whitespace-nowrap dark:text-white">{product.category}</td>
-                                <td className="px-6 py-4 font-medium text-gray-900 whitespace-nowrap dark:text-white">{product.itemWeight}</td>
-                                <td className="px-6 py-4 font-medium text-gray-900 whitespace-nowrap dark:text-white">
-                                    <button className="text-white bg-blue-700 hover:bg-blue-800 focus:ring-4 focus:ring-blue-300 font-medium rounded-lg text-sm px-5 py-2.5 me-2 mb-2 dark:bg-blue-600 dark:hover:bg-blue-700 focus:outline-none dark:focus:ring-blue-800"><Link to={`/view/` + product._id}>View</Link></button>
-                                    <button className="text-white bg-blue-700 hover:bg-blue-800 focus:ring-4 focus:ring-blue-300 font-medium rounded-lg text-sm px-5 py-2.5 me-2 mb-2 dark:bg-blue-600 dark:hover:bg-blue-700 focus:outline-none dark:focus:ring-blue-800"><Link to={`/edit/` + product._id}>Edit</Link></button>
-                                    <button className="focus:outline-none text-white bg-red-700 hover:bg-red-800 focus:ring-4 focus:ring-red-300 font-medium rounded-lg text-sm px-5 py-2.5 me-2 mb-2 dark:bg-red-600 dark:hover:bg-red-700 dark:focus:ring-red-900" onClick={() => deleteUser(product._id)}>Delete</button>
-                                </td>
-                            </tr>
-                        )
-                    })
-
-                }
-            </tbody>
-        </table>
-    </div></>;
+                                    </td>
+                                </tr>
+                            )
+                        })
+                    }
+                </tbody>
+            </table>
+        </div></>;
 };
 
 export default User;
